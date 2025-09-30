@@ -94,6 +94,7 @@ void printMatrix(const vector<vector<T>>& A){
         }
         cout << endl;
     }
+    cout << endl;
 }
 
 pair<vector<double>, vector<vector<double>>> EigenJacobi(const vector<vector<double>>& A, double tol){
@@ -105,7 +106,7 @@ pair<vector<double>, vector<vector<double>>> EigenJacobi(const vector<vector<dou
     */
 
     int n = A.size();
-    (n == 0 || A[0].size() != n) ? throw invalid_argument("Matrix must be squared. \n") : false;
+    (n == 0 || A[0].size() != n) ? throw invalid_argument("Matrix must be squared. \n") : true;
 
     vector<vector<double>> currentA = A;
     vector<double> eigenvals(n);
@@ -175,6 +176,56 @@ pair<vector<double>, vector<vector<double>>> EigenJacobi(const vector<vector<dou
     return make_pair(eigenvals, eigenvecs);
 }
 
+pair<double, vector<double>> EigenPowerIteration(const vector<vector<double>>& A, const vector<double>& v0){
+    /*
+    Find a single eigenvalue using the Power Iteration method.
+
+    :return
+        one eigenvalue of the matrix A.
+    */
+
+    //normalizing init vector
+    int iterCount = 0, maxIter = 100, n = A.size();
+    double norm = 0.0, sum = 0.0, eigenvalue1 = 0.0;
+
+    for(double val : v0){
+        sum += (val * val);
+    }
+    vector<double> v = v0;
+    for(int i = 0; i < n; i++){
+        v[i] /= sqrt(sum);
+    }
+
+    (n == 0 || A[0].size() != n || v0.size() != n) ? throw invalid_argument("Matrix/vector in wrong dimension. \n") : true;
+
+    while(iterCount++ < maxIter){
+        vector<double> Av(n, 0.0);
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                Av[i] += A[i][j] * v[j];
+            }
+        }
+
+        // normalize vector by L2 norm
+        norm = 0.0;
+        for(double val : Av)
+            norm += (val * val);
+        norm = sqrt(norm);
+        
+        for(int i = 0; i < n; i++){
+            v[i] = Av[i] / norm;
+        }
+
+        if(abs(norm - eigenvalue1) < tol){
+            eigenvalue1 = norm;
+            break;
+        }
+
+        eigenvalue1 = norm;
+    }   
+    return make_pair(eigenvalue1, v);
+}
+
 void printVector(const vector<double>& b){
     /*
     Print a vector
@@ -186,9 +237,7 @@ void printVector(const vector<double>& b){
 }
 
 int main(){
-
     // Problem 1: Calculating the inverse of a matrix
-
     vector<vector<double>> A = {
         {4, 2, 2, 1},
         {2, -3, 1, 1},
@@ -210,6 +259,13 @@ int main(){
     
     printVector(Jacobi.first);
     printMatrix(Jacobi.second);
+
+    // With power iteration
+    vector<double> v0 = {1, 2, 4, -1};
+    pair<double, vector<double>> PowerIteration = EigenPowerIteration(A, v0);
+
+    cout << "Lambda1 : " << PowerIteration.first << endl;
+    printVector(PowerIteration.second);
 
     return 0;
 }
