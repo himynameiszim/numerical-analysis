@@ -186,9 +186,34 @@ pair<vector<T>, vector<vector<T>>> EigenDeflatedPowerIteration(const vector<vect
 
 }
 
+template<typename T>
+vector<T> EigenQRIteration(const vector<vector<T>>& A){
+    /*
+    Finding all eigenvalues from a matrix A, A does not have to be symmetric.
+        Since the iteration takes action through orthogonalization (Gram-Schmidt), it is numerically stable.
+        QR iteration is not guranteed to converge. Gershgorin circle theorem provides an error bound (thus, it gurantees convergence for diagonally dominant matrices).
+
+    :return
+        a vector, with all eigenvalues of A.
+    */
+    int n = A.size(), maxIter = 50;
+    vector<vector<T>> Ak = A;
+    for(int k = 0; k < maxIter; k++){
+        auto [Q, R] = factorizeQR(Ak);
+        Ak = matrixMultiply(R, Q); // note: this is multiplied in reverse order
+    }
+    vector<T> eigenvalues(n, T(0));
+    for(int i = 0; i < n; i++){
+        eigenvalues[i] = Ak[i][i];
+    }
+    return eigenvalues;
+}
+
 template pair<vector<double>, vector<vector<double>>> EigenJacobi(const vector<vector<double>>& A, double tol);
 template pair<vector<float>, vector<vector<float>>> EigenJacobi(const vector<vector<float>>& A, double tol);
 template pair<double, vector<double>> EigenPowerIteration(const vector<vector<double>>& A, const vector<double>& v0);
 template pair<float, vector<float>> EigenPowerIteration(const vector<vector<float>>& A, const vector<float>& v0);
 template pair<vector<double>, vector<vector<double>>> EigenDeflatedPowerIteration(const vector<vector<double>>& A, const vector<double>& v0, double tol, int k);
 template pair<vector<float>, vector<vector<float>>> EigenDeflatedPowerIteration(const vector<vector<float>>& A, const vector<float>& v0, double tol, int k);
+template vector<double> EigenQRIteration(const vector<vector<double>>& A);
+template vector<float> EigenQRIteration(const vector<vector<float>>& A);

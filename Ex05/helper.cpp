@@ -72,14 +72,13 @@ vector<vector<T>> matrixMultiply(const vector<vector<T>>& A, const vector<vector
    (A[0].size() != B[0].size()) ? throw invalid_argument("Invalid dimension") : true;
    int n = A.size(), m = A[0].size();
    vector<vector<T>> result(n, vector<T>(n));
-   int k = 0;
+   int k;
    for(int i = 0; i < n; i++){
-        T sum = T(0);
-        for(int j = 0; j < m; j++){
-            sum += A[i][j] * B[j][i];
+        for(int j = 0; j < n; j++){
+            for(k = 0; k < n; k++){
+                result[i][j] += A[i][k] * B[k][j];
+            }
         }
-        result[i][k] = sum;
-        k++;
    }
 
    return result;
@@ -165,6 +164,50 @@ void printVector(const vector<T>& b){
    cout << endl;
 }
 
+template<typename T>
+pair<vector<vector<T>>, vector<vector<T>>> factorizeQR(const vector<vector<T>>& A){
+    /*
+    QR factorization for the matrix A using Gram-Scmidt orthogonalization.
+
+    :return
+        a pair, Q and R.
+    */
+    int n = A.size();
+
+    // getColumn function
+    auto getColumn = [](const vector<vector<T>>& B, int j) -> vector<T>{
+        int n = B.size();
+        vector<T> col(n);
+        for(int i = 0; i < n; i++){
+            col[i] = B[i][j];
+        }
+        return col;
+    };
+
+    vector<vector<T>> Q(n, vector<T>(n, T(0)));
+    vector<vector<T>> R(n, vector<T>(n, T(0)));
+
+    for(int j = 0; j < n; j++){
+        vector<T> u = getColumn(A, j);
+        for(int i = 0; i < j; i++){
+            vector<T> q_i = getColumn(Q, i); // i-th col from current Q
+            R[i][j] = dotProduct(q_i, u);
+
+            for(int k = 0; k < n; k++){
+                u[k] -= R[i][j] * q_i[k];
+            }
+        }
+
+        T norm = sqrt(dotProduct(u, u));
+        R[j][j] = norm;
+
+        for(int i = 0; i < n; i++){
+            Q[i][j] = u[i] / norm;
+        }
+    }
+    return make_pair(Q, R);
+}
+
 template vector<vector<double>> invertMatrix(const vector<vector<double>>& A);
 template vector<vector<float>> invertMatrix(const vector<vector<float>>& A);
 template vector<vector<double>> matrixMultiply(const vector<vector<double>>& A, const vector<vector<double>>& B);
@@ -181,4 +224,6 @@ template vector<double> scalerMultiply(const vector<double>& a, double s);
 template vector<float> scalerMultiply(const vector<float>& a, double s);
 template vector<vector<double>> transposeMatrix(const vector<vector<double>>& A);
 template vector<vector<float>> transposeMatrix(const vector<vector<float>>& A);
+template pair<vector<vector<double>>, vector<vector<double>>> factorizeQR(const vector<vector<double>>& A);
+template pair<vector<vector<float>>, vector<vector<float>>> factorizeQR(const vector<vector<float>>& A);
 

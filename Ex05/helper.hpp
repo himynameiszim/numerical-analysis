@@ -21,5 +21,7 @@ template<typename T>
 vector<T> scalerMultiply(const vector<T>& a, double s);
 template<typename T>
 vector<vector<T>> transposeMatrix(const vector<vector<T>>& A);
+template<typename T>
+pair<vector<vector<T>>, vector<vector<T>>> factorizeQR(const vector<vector<T>>& A);
 
 #endif

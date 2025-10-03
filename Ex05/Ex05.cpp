@@ -40,10 +40,15 @@ int main(){
         printVector(PowerIteration.second);
 
         // With Deflated power iteration
-        pair<vector<double>, vector<vector<double>>> DeflatedPowerIteration = EigenDeflatedPowerIteration(A, v0, tol, 3);
+        pair<vector<double>, vector<vector<double>>> DeflatedPowerIteration = EigenDeflatedPowerIteration<double>(A, v0, tol, 3);
 
         printVector(DeflatedPowerIteration.first);
         printMatrix(DeflatedPowerIteration.second);
+
+        // With QR Iteration
+        vector<double> QREigenvalues = EigenQRIteration<double>(A);
+
+        printVector<double>(QREigenvalues);
 
     return 0;
 }
