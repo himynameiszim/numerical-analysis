@@ -13,5 +13,13 @@ template<typename T>
 void printMatrix(const vector<vector<T>>& A);
 template<typename T>
 void printVector(const vector<T>& b);
+template<typename T>
+T dotProduct(const vector<T>& a, const vector<T>& b);
+template<typename T>
+vector<T> vectorSubtract(const vector<T>& a, const vector<T>& b);
+template<typename T>
+vector<T> scalerMultiply(const vector<T>& a, double s);
+template<typename T>
+vector<vector<T>> transposeMatrix(const vector<vector<T>>& A);
 
 #endif

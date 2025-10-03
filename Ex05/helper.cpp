@@ -86,6 +86,61 @@ vector<vector<T>> matrixMultiply(const vector<vector<T>>& A, const vector<vector
 } 
 
 template<typename T>
+T dotProduct(const vector<T>& a, const vector<T>& b){
+    /*
+    Dot product between 2 vectors.
+    */
+    int n = a.size();
+    T sum = T(0);
+    for(int i = 0; i < n; i++){
+        sum += a[i] * b[i];
+    }
+    return sum;
+}
+
+template<typename T>
+vector<T> vectorSubtract(const vector<T>& a, const vector<T>& b){
+    /*
+    Subtract 2 vectors.
+    */
+    int n = a.size();
+    vector<T> result(n, T(0));
+    for(int i = 0; i < n; i++){
+            result[i] = a[i] - b[i];
+    }
+    return result;
+}
+
+template<typename T>
+vector<T> scalerMultiply(const vector<T>& a, double s){
+    /*
+    Multiply scaler by vector.
+    */
+    int n = a.size();
+    vector<T> result(n, T(0));
+    for(int i = 0; i < n; i++){
+        result[i] = s * a[i];
+    }
+    return result;
+}
+
+template<typename T>
+vector<vector<T>> transposeMatrix(const vector<vector<T>>& A){
+    /*
+    Invert a matrix
+    */
+    int n = A.size();
+    int m = A[0].size();
+    vector<vector<T>> B = A;
+
+    for(int i = 0; i < n; ++i){
+        for(int j = 0; j < m; ++j)
+            B[i][j] = A[j][i];
+    }
+    return B;
+}
+
+template<typename T>
 void printMatrix(const vector<vector<T>>& A){
     /*
     Print a mtrix
@@ -118,3 +173,12 @@ template void printMatrix(const vector<vector<double>>& A);
 template void printMatrix(const vector<vector<float>>& A);
 template void printVector(const vector<double>& b);
 template void printVector(const vector<float>& b);
+template double dotProduct(const vector<double>& a, const vector<double>& b);
+template float dotProduct(const vector<float>& a, const vector<float>& b);
+template vector<double> vectorSubtract(const vector<double>& a, const vector<double>& b);
+template vector<float> vectorSubtract(const vector<float>& a, const vector<float>& b);
+template vector<double> scalerMultiply(const vector<double>& a, double s);
+template vector<float> scalerMultiply(const vector<float>& a, double s);
+template vector<vector<double>> transposeMatrix(const vector<vector<double>>& A);
+template vector<vector<float>> transposeMatrix(const vector<vector<float>>& A);
+

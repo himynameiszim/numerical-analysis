@@ -1,6 +1,7 @@
 #include<bits/stdc++.h>
 
 #include "eigen.hpp"
+#include "helper.hpp"
 
 using namespace std;
 
@@ -135,7 +136,59 @@ pair<T, vector<T>> EigenPowerIteration(const vector<vector<T>>& A, const vector<
     return make_pair(eigenvalue1, v);
 }
 
+template<typename T>
+pair<vector<T>, vector<vector<T>>> EigenDeflatedPowerIteration(const vector<vector<T>>& A, const vector<T>& v0, double tol, int k){
+    /*
+    Deflated Power Iteration to find top k-largest, eigenvalues and their corresponding eigenvectors.
+        After each convergence of Power Iteration, there is a small chance that the initial guess vector has no component parallel to the rest eigenvectors.
+        Thus, keep multiplying does not do anything. So after each k-th convergence, we project xk out of vk, since eigenvectors of A are orthogonal,
+        we obtain the (k+1)-th largest eigenvalue.
+    (This requires A to be a symmetric matrix). One can try other deflation techniques (Householder transformation, ...) still to achieve the same result.
+    */
+    vector<T> eigenvalues;
+    eigenvalues.push_back(EigenPowerIteration(A, v0).first);
+    vector<vector<T>> eigenvectors;
+    eigenvectors.push_back(EigenPowerIteration(A, v0).second);
+    vector<vector<T>> B = A;
+    int n = A.size();
+    
+    for(int l = 0; l < k; l++){
+        T lambda = T(0);
+        vector<T> v_l(n);
+        random_device rd;
+        std::mt19937 gen(rd());
+        uniform_real_distribution<> dis(0.0, 1.0);
+        for(int i = 0; i < n; ++i) v_l[i] = dis(gen);
+        int maxIter = 50;
+        while(maxIter--){
+            vector<T> u_l = v_l;
+            for(const auto& prev_vec : eigenvectors)
+                u_l = vectorSubtract(u_l, scalerMultiply(prev_vec, dotProduct(v_l, prev_vec)));
+            
+            vector<T> w_l(n, T(0));
+            for(int i = 0; i < n; i++){
+                for(int j = 0; j < n; j++){
+                    w_l[i] += B[i][j] * u_l[j];
+                }
+            }
+
+            double norm = sqrt(dotProduct(w_l, w_l));
+            for(int i = 0; i < n; i++){
+                v_l[i] = w_l[i] / norm;
+            }
+            if(abs(norm - lambda) < tol) break;
+            lambda = norm;
+        }
+        eigenvalues.push_back(lambda);
+        eigenvectors.push_back(v_l);
+    }  
+    return make_pair(eigenvalues, transposeMatrix(eigenvectors));
+
+}
+
 template pair<vector<double>, vector<vector<double>>> EigenJacobi(const vector<vector<double>>& A, double tol);
 template pair<vector<float>, vector<vector<float>>> EigenJacobi(const vector<vector<float>>& A, double tol);
 template pair<double, vector<double>> EigenPowerIteration(const vector<vector<double>>& A, const vector<double>& v0);
 template pair<float, vector<float>> EigenPowerIteration(const vector<vector<float>>& A, const vector<float>& v0);
+template pair<vector<double>, vector<vector<double>>> EigenDeflatedPowerIteration(const vector<vector<double>>& A, const vector<double>& v0, double tol, int k);
+template pair<vector<float>, vector<vector<float>>> EigenDeflatedPowerIteration(const vector<vector<float>>& A, const vector<float>& v0, double tol, int k);
